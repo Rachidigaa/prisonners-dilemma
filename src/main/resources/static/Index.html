@@ -6,6 +6,7 @@
     <script>
         let partieId;
         let joueur;
+
         function creerNouvellePartie() {
             const nomJoueur1 = prompt("Entrez votre nom (Joueur 1) :");
             const strategieJoueur1 = prompt("Entrez votre stratégie (ex: donnantdonnant, aleatoire) :");
@@ -51,6 +52,22 @@
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById("resultatTour").innerText = data;
+
+                    // Vérifier si la partie est terminée
+                    fetch(`http://localhost:8080/partie/fin/${partieId}`)
+                        .then(response => response.json())
+                        .then(result => {
+                            const resultatFinal = result.resultat;
+                            if (resultatFinal) {
+                                // Partie terminée, afficher le résultat final et désactiver les boutons
+                                alert(resultatFinal);
+                                document.getElementById("cooperer").disabled = true;
+                                document.getElementById("trahir").disabled = true;
+                                document.getElementById("resultatTour").innerText = `
+                                    Résultat Final: ${resultatFinal}\n
+                                    Score Joueur 1: ${result.scoreJoueur1}, Score Joueur 2: ${result.scoreJoueur2}`;
+                            }
+                        });
                 });
         }
     </script>
@@ -65,8 +82,9 @@
 <p id="resultat"></p>
 
 <h3>Jouer un tour</h3>
-<button onclick="jouerTour(true)">Cooperer</button>
-<button onclick="jouerTour(false)">Trahir</button>
+<button id="cooperer" onclick="jouerTour(true)">Cooperer</button>
+<button id="trahir" onclick="jouerTour(false)">Trahir</button>
 <p id="resultatTour"></p>
+
 </body>
 </html>

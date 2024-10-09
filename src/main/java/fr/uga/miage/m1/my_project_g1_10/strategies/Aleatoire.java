@@ -7,6 +7,6 @@ import java.util.Random;
 public class Aleatoire implements Strategie {
     @Override
     public boolean decider(Joueur adversaire) {
-        return new Random().nextBoolean(); // Retourne aléatoirement true (coopérer) ou false (trahir)
+        return new Random().nextBoolean();
     }
 }

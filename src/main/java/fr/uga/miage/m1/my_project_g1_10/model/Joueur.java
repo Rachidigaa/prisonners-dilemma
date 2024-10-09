@@ -12,7 +12,7 @@ public class Joueur {
         this.nom = nom;
         this.strategie = strategie;
         this.score = 0;
-        this.derniereDecision = true; // Coopérer au début
+        this.derniereDecision = true;
     }
 
     public boolean jouerTour(Joueur adversaire) {

@@ -5,10 +5,6 @@ import fr.uga.miage.m1.my_project_g1_10.model.Partie;
 import fr.uga.miage.m1.my_project_g1_10.strategies.*;
 import org.springframework.web.bind.annotation.*;
 
-
-
-
-import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,21 +15,17 @@ public class PartieController {
 
     private Map<Long, Partie> partiesEnCours = new HashMap<>();
     private long idCompteur = 1;
-    private Map<Long, Boolean> joueur2Connecte = new HashMap<>();  // Pour vérifier si le joueur 2 est connecté
+    private Map<Long, Boolean> joueur2Connecte = new HashMap<>();
 
     @PostMapping("/nouvelle")
     public String nouvellePartie(@RequestParam String nomJoueur1, @RequestParam String strategieJoueur1, @RequestParam int nbTours) {
-        // Création du joueur 1 et de la partie sans le joueur 2 au début
         Joueur joueur1 = new Joueur(nomJoueur1, creerStrategie(strategieJoueur1));
-        Partie partie = new Partie(joueur1, null, nbTours);  // Joueur 2 sera ajouté plus tard
+        Partie partie = new Partie(joueur1, null, nbTours);
 
         partiesEnCours.put(idCompteur, partie);
-        joueur2Connecte.put(idCompteur, false);  // Joueur 2 n'est pas encore connecté
+        joueur2Connecte.put(idCompteur, false);
 
-        // Démarrer le timer pour le joueur 1
         partie.attendreDecisionJoueur1();
-
-        // Retourne l'ID de la partie que le joueur 1 partagera
         return "Nouvelle partie créée avec l'ID : " + idCompteur++;
     }
 
@@ -49,12 +41,10 @@ public class PartieController {
             return "La partie a déjà un deuxième joueur.";
         }
 
-        // Création du joueur 2 et ajout dans la partie
         Joueur joueur2 = new Joueur(nomJoueur2, creerStrategie(strategieJoueur2));
         partie.setJoueur2(joueur2);
-        joueur2Connecte.put(id, true);  // Le joueur 2 est maintenant connecté
+        joueur2Connecte.put(id, true);
 
-        // Démarrer le timer pour le joueur 2
         partie.attendreDecisionJoueur2();
 
         return "Vous avez rejoint la partie avec l'ID : " + id;
@@ -72,9 +62,9 @@ public class PartieController {
             if (partie.getJoueur2() == null || !joueur2Connecte.get(id)) {
                 return "Le joueur 2 n'est pas encore connecté.";
             }
-            partie.jouerTourInteractifJoueur1(decision);  // Joueur 1 joue
+            partie.jouerTourInteractifJoueur1(decision);
         } else if (joueur.equals("joueur2")) {
-            partie.jouerTourInteractifJoueur2(decision);  // Joueur 2 joue
+            partie.jouerTourInteractifJoueur2(decision);
         } else {
             return "Joueur non reconnu.";
         }
@@ -82,7 +72,27 @@ public class PartieController {
         return "Tour joué. Score : Joueur 1 = " + partie.getJoueur1().getScore() + ", Joueur 2 = " + partie.getJoueur2().getScore();
     }
 
-    // Méthode pour créer une stratégie en fonction du nom
+    @GetMapping("/fin/{id}")
+    public Map<String, String> finPartie(@PathVariable Long id) {
+        Partie partie = partiesEnCours.get(id);
+
+        if (partie == null) {
+            throw new IllegalArgumentException("Partie non trouvée.");
+        }
+
+        if (partie.estPartieTerminee()) {
+            // On renvoie le score final et le résultat (vainqueur)
+            Map<String, String> resultatFinal = new HashMap<>();
+            resultatFinal.put("resultat", partie.obtenirResultatFinal());
+            resultatFinal.put("scoreJoueur1", String.valueOf(partie.getJoueur1().getScore()));
+            resultatFinal.put("scoreJoueur2", String.valueOf(partie.getJoueur2().getScore()));
+            return resultatFinal;
+        } else {
+            throw new IllegalStateException("La partie n'est pas encore terminée.");
+        }
+    }
+
+
     private Strategie creerStrategie(String nomStrategie) {
         switch (nomStrategie.toLowerCase()) {
             case "donnantdonnant":

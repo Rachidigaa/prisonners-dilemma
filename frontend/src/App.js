@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import PartieService from './services/partieService';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import './App.css'; // Fichier CSS pour l'animation
+import './App.css';
 
 function App() {
-    const [idPartie, setIdPartie] = useState(null); // ID de la partie
-    const [joueur, setJoueur] = useState(''); // Nom du joueur
-    const [strategie, setStrategie] = useState(''); // Stratégie du joueur
-    const [decision, setDecision] = useState(true); // Décision pour chaque tour (coopérer ou trahir)
-    const [isJoueur1, setIsJoueur1] = useState(false); // Savoir si c'est le joueur 1 ou 2
-    const [partieCreer, setPartieCreer] = useState(false); // Partie créée ou rejointe
+    const [idPartie, setIdPartie] = useState(null);
+    const [joueur, setJoueur] = useState('');
+    const [strategie, setStrategie] = useState('');
+    const [nbTours, setNbTours] = useState(0);
+    const [tourActuel, setTourActuel] = useState(0);
+    const [decision, setDecision] = useState(true);
+    const [isJoueur1, setIsJoueur1] = useState(false);
+    const [partieCreer, setPartieCreer] = useState(false);
+    const [partieTerminee, setPartieTerminee] = useState(false);
+    const [scoreJoueur1, setScoreJoueur1] = useState(0);
+    const [scoreJoueur2, setScoreJoueur2] = useState(0);
+    const [messageFinPartie, setMessageFinPartie] = useState('');
 
-    // Créer une nouvelle partie (Joueur 1)
     const handleCreerPartie = () => {
-        PartieService.creerNouvellePartie(joueur, strategie, 5) // Nombre de tours fixé à 5
+        PartieService.creerNouvellePartie(joueur, strategie, nbTours)
             .then((response) => {
-                const id = response.data.split(':')[1].trim(); // Récupérer l'ID de la partie
+                const id = response.data.split(':')[1].trim();
                 setIdPartie(id);
                 setIsJoueur1(true);
                 setPartieCreer(true);
+                setTourActuel(0);
                 alert(`Nouvelle partie créée avec l'ID : ${id}`);
             })
             .catch((error) => {
@@ -26,7 +32,7 @@ function App() {
             });
     };
 
-    // Rejoindre une partie (Joueur 2)
+
     const handleRejoindrePartie = () => {
         PartieService.rejoindrePartie(idPartie, joueur, strategie)
             .then(() => {
@@ -43,7 +49,32 @@ function App() {
         const joueurIdentifiant = isJoueur1 ? 'joueur1' : 'joueur2';
         PartieService.jouerTour(idPartie, decision, joueurIdentifiant)
             .then((response) => {
-                alert(`Tour joué : ${response.data}`);
+                setTourActuel((prevTour) => prevTour + 1);
+                if (tourActuel + 1 >= nbTours) {
+                    setPartieTerminee(true);
+                    PartieService.finPartie(idPartie)
+                        .then((res) => {
+                            console.log('Réponse des scores:', res.data);
+                            const scoreJ1 = res.data.scoreJoueur1 || 0;
+                            const scoreJ2 = res.data.scoreJoueur2 || 0;
+
+                            setScoreJoueur1(scoreJ1);
+                            setScoreJoueur2(scoreJ2);
+
+                            if (scoreJ1 > scoreJ2) {
+                                setMessageFinPartie(isJoueur1 ? 'Vous avez gagné !' : 'Vous avez perdu !');
+                            } else if (scoreJ1 < scoreJ2) {
+                                setMessageFinPartie(isJoueur1 ? 'Vous avez perdu !' : 'Vous avez gagné !');
+                            } else {
+                                setMessageFinPartie('Match nul !');
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Erreur lors de la récupération des scores', error);
+                        });
+                } else {
+                    alert(`Tour joué : ${response.data}`);
+                }
             })
             .catch((error) => {
                 console.error('Erreur lors du tour', error);
@@ -85,7 +116,18 @@ function App() {
                                 </Form.Control>
                             </Form.Group>
 
-                            {/* Si c'est le joueur 1, il crée une partie */}
+                            {isJoueur1 && (
+                                <Form.Group>
+                                    <Form.Label>Nombre de tours</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Entrez le nombre de tours"
+                                        value={nbTours}
+                                        onChange={(e) => setNbTours(e.target.value)}
+                                    />
+                                </Form.Group>
+                            )}
+
                             {isJoueur1 ? (
                                 <Button variant="primary" onClick={handleCreerPartie}>
                                     Créer Partie
@@ -110,12 +152,10 @@ function App() {
                     </Col>
                 </Row>
             )}
-
-            {/* Interface pour jouer un tour après avoir rejoint ou créé une partie */}
-            {partieCreer && (
+            {partieCreer && !partieTerminee && (
                 <Row>
                     <Col>
-                        <h2>Jouer un tour</h2>
+                        <h2>Jouer un tour (Tour {tourActuel + 1}/{nbTours})</h2>
                         <Form>
                             <Form.Group>
                                 <Form.Check
@@ -140,6 +180,12 @@ function App() {
                         </Form>
                     </Col>
                 </Row>
+            )}
+            {partieTerminee && (
+                <div className="message-fin animate__animated animate__zoomIn">
+                    <h2>{messageFinPartie}</h2>
+                    <h4>Score final : Joueur 1 - {scoreJoueur1} | Joueur 2 - {scoreJoueur2}</h4>
+                </div>
             )}
 
             {!isJoueur1 && !partieCreer && (

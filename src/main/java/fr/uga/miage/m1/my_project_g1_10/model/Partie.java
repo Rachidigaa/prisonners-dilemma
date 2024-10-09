@@ -1,7 +1,10 @@
 package fr.uga.miage.m1.my_project_g1_10.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
 public class Partie {
     private Joueur joueur1;
     private Joueur joueur2;
@@ -11,10 +14,10 @@ public class Partie {
     private boolean joueur2Pret = false;
     private boolean decisionJoueur1;
     private boolean decisionJoueur2;
-    private final int T = 5; // Trahison
-    private final int D = 0; // Duperie
-    private final int C = 3; // Coopération mutuelle
-    private final int P = 1; // Trahison mutuelle
+    private final int T = 5;
+    private final int D = 0;
+    private final int C = 3;
+    private final int P = 1;
 
     private Timer timer1;
     private Timer timer2;
@@ -25,7 +28,6 @@ public class Partie {
         this.nbTours = nbTours;
     }
 
-    // Fonction qui démarre le timer et applique la stratégie automatiquement si le joueur ne joue pas
     public void attendreDecisionJoueur1() {
         timer1 = new Timer();
         timer1.schedule(new TimerTask() {
@@ -38,7 +40,7 @@ public class Partie {
                     verifierSiTousLesJoueursOntJoue();
                 }
             }
-        }, 10000);  // Délai de 2 secondes
+        }, 10000);
     }
 
     public void attendreDecisionJoueur2() {
@@ -53,36 +55,36 @@ public class Partie {
                     verifierSiTousLesJoueursOntJoue();
                 }
             }
-        }, 10000);  // Délai de 2 secondes
+        }, 10000);
     }
 
     public void jouerTourInteractifJoueur1(boolean decision) {
         this.decisionJoueur1 = decision;
         this.joueur1Pret = true;
-        timer1.cancel();  // Annuler le timer si le joueur a joué à temps
+        timer1.cancel();
         verifierSiTousLesJoueursOntJoue();
     }
 
     public void jouerTourInteractifJoueur2(boolean decision) {
         this.decisionJoueur2 = decision;
         this.joueur2Pret = true;
-        timer2.cancel();  // Annuler le timer si le joueur a joué à temps
+        timer2.cancel();
         verifierSiTousLesJoueursOntJoue();
     }
 
     private void verifierSiTousLesJoueursOntJoue() {
         if (joueur1Pret && joueur2Pret) {
-            // Si les deux joueurs ont joué, calculer les scores
             calculerScore(decisionJoueur1, decisionJoueur2);
 
-            joueur1Pret = false;  // Remet à zéro l'état des joueurs pour le prochain tour
+            joueur1Pret = false;
             joueur2Pret = false;
             tourActuel++;
 
             afficherResultatTour();
+
             if (tourActuel < nbTours) {
-                attendreDecisionJoueur1();  // Attendre pour le prochain tour
-                attendreDecisionJoueur2();  // Attendre pour le prochain tour
+                attendreDecisionJoueur1();
+                attendreDecisionJoueur2();
             } else {
                 System.out.println("La partie est terminée.");
             }
@@ -111,6 +113,27 @@ public class Partie {
         System.out.println(joueur2.getNom() + " a choisi " + (decisionJoueur2 ? "Coopérer" : "Trahir"));
         System.out.println("Score de " + joueur1.getNom() + " : " + joueur1.getScore());
         System.out.println("Score de " + joueur2.getNom() + " : " + joueur2.getScore());
+    }
+
+    public boolean estPartieTerminee() {
+        return tourActuel >= nbTours;
+    }
+
+    public String obtenirResultatFinal() {
+        if (joueur1.getScore() > joueur2.getScore()) {
+            return "Joueur 1 est le vainqueur!";
+        } else if (joueur1.getScore() < joueur2.getScore()) {
+            return "Joueur 2 est le vainqueur!";
+        } else {
+            return "Match nul!";
+        }
+    }
+
+    public Map<String, Integer> obtenirScores() {
+        Map<String, Integer> scores = new HashMap<>();
+        scores.put("scoreJoueur1", joueur1.getScore());
+        scores.put("scoreJoueur2", joueur2.getScore());
+        return scores;
     }
 
     public Joueur getJoueur1() {

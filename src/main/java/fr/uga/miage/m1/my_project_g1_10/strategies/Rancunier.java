@@ -10,6 +10,6 @@ public class Rancunier implements Strategie {
         if (!adversaire.getDerniereDecision()) {
             aEteTrahi = true;
         }
-        return !aEteTrahi; // Coopérer jusqu'à être trahi, puis toujours trahir
+        return !aEteTrahi;
     }
 }

@@ -35,3 +35,18 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Ignore les dossiers node_modules et target
+node_modules/
+target/
+
+# Logs
+*.log
+
+# Ignorer les fichiers de l'IDE
+.idea/
+*.iml
+
+# Ignorer les fichiers spécifiques à Mac
+.DS_Store
+
