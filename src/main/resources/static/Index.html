@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dilemme des Prisonniers - Multijoueur</title>
+    <script>
+        let partieId;
+        let joueur;
+        function creerNouvellePartie() {
+            const nomJoueur1 = prompt("Entrez votre nom (Joueur 1) :");
+            const strategieJoueur1 = prompt("Entrez votre stratégie (ex: donnantdonnant, aleatoire) :");
+            const nbTours = prompt("Nombre de tours :");
+
+            fetch(`http://localhost:8080/partie/nouvelle?nomJoueur1=${nomJoueur1}&strategieJoueur1=${strategieJoueur1}&nbTours=${nbTours}`, {
+                method: "POST"
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("resultat").innerText = data;
+                    partieId = data.split(":")[1].trim();
+                    joueur = "joueur1";
+                    alert(`Partie créée avec l'ID : ${partieId}. Partagez cet ID avec l'autre joueur.`);
+                });
+        }
+
+        function rejoindrePartie() {
+            const nomJoueur2 = prompt("Entrez votre nom (Joueur 2) :");
+            const strategieJoueur2 = prompt("Entrez votre stratégie (ex: donnantdonnant, aleatoire) :");
+            partieId = prompt("Entrez l'ID de la partie :");
+
+            fetch(`http://localhost:8080/partie/rejoindre?id=${partieId}&nomJoueur2=${nomJoueur2}&strategieJoueur2=${strategieJoueur2}`, {
+                method: "POST"
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("resultat").innerText = data;
+                    joueur = "joueur2";
+                    alert(`Vous avez rejoint la partie avec l'ID : ${partieId}. Vous êtes maintenant ${joueur}.`);
+                });
+        }
+
+        function jouerTour(decision) {
+            if (!partieId || !joueur) {
+                alert("Vous devez d'abord créer ou rejoindre une partie.");
+                return;
+            }
+
+            fetch(`http://localhost:8080/partie/${partieId}/jouer?decision=${decision}&joueur=${joueur}`, {
+                method: "POST"
+            })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("resultatTour").innerText = data;
+                });
+        }
+    </script>
+</head>
+<body>
+<h1>Dilemme des Prisonniers - Interface Multijoueur</h1>
+
+<button onclick="creerNouvellePartie()">Créer une nouvelle partie</button>
+<button onclick="rejoindrePartie()">Rejoindre une partie</button>
+
+<h3>Résultat de la partie :</h3>
+<p id="resultat"></p>
+
+<h3>Jouer un tour</h3>
+<button onclick="jouerTour(true)">Cooperer</button>
+<button onclick="jouerTour(false)">Trahir</button>
+<p id="resultatTour"></p>
+</body>
+</html>
