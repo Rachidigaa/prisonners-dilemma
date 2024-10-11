@@ -14,7 +14,7 @@ public class Partie {
     private boolean joueur2Pret = false;
     private boolean decisionJoueur1;
     private boolean decisionJoueur2;
-    private final int T = 5;
+    private final int T = 5; 
     private final int D = 0;
     private final int C = 3;
     private final int P = 1;
@@ -74,6 +74,10 @@ public class Partie {
 
     private void verifierSiTousLesJoueursOntJoue() {
         if (joueur1Pret && joueur2Pret) {
+
+            joueur1.ajouterChoix(decisionJoueur1);
+            joueur2.ajouterChoix(decisionJoueur2);
+
             calculerScore(decisionJoueur1, decisionJoueur2);
 
             joueur1Pret = false;
@@ -92,16 +96,16 @@ public class Partie {
     }
 
     private void calculerScore(boolean decision1, boolean decision2) {
-        if (decision1 && decision2) { // Coopération mutuelle [c, c]
+        if (decision1 && decision2) {
             joueur1.ajouterScore(C);
             joueur2.ajouterScore(C);
-        } else if (!decision1 && !decision2) { // Trahison mutuelle [t, t]
+        } else if (!decision1 && !decision2) {
             joueur1.ajouterScore(P);
             joueur2.ajouterScore(P);
-        } else if (decision1 && !decision2) { // Joueur 1 coopère, joueur 2 trahit [c, t]
+        } else if (decision1 && !decision2) {
             joueur1.ajouterScore(D);
             joueur2.ajouterScore(T);
-        } else { // Joueur 1 trahit, joueur 2 coopère [t, c]
+        } else {
             joueur1.ajouterScore(T);
             joueur2.ajouterScore(D);
         }

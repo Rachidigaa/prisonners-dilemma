@@ -9,7 +9,6 @@ public class Aleatoire implements Strategie {
 
     @Override
     public boolean decider(Joueur adversaire) {
-        boolean decision = secureRandom.nextBoolean();
-        return decision;
+        return secureRandom.nextBoolean();
     }
 }

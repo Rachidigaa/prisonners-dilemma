@@ -13,7 +13,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <java.version>17</java.version>
-        <spring-boot.version>3.3.4</spring-boot.version> <!-- Ajoutez la version de Spring Boot ici -->
+        <spring-boot.version>3.3.4</spring-boot.version> <!-- Version de Spring Boot -->
     </properties>
 
     <!-- Dependencies -->
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version> <!-- Ajoutez la version de Lombok -->
+            <version>1.18.24</version> <!-- Version de Lombok -->
             <scope>provided</scope>
         </dependency>
 
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>1.8.1</version> <!-- Ajoutez la version de JUnit Platform Launcher -->
+            <version>1.8.1</version> <!-- Version de JUnit Platform Launcher -->
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -83,6 +83,9 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-parameters</arg> <!-- Ajout de l'option -parameters -->
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
