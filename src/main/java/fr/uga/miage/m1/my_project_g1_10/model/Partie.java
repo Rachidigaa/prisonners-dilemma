@@ -14,10 +14,10 @@ public class Partie {
     private boolean joueur2Pret = false;
     private boolean decisionJoueur1;
     private boolean decisionJoueur2;
-    private final int T = 5; 
-    private final int D = 0;
-    private final int C = 3;
-    private final int P = 1;
+    private static final int TRAHIR_SCORE = 5;
+    private static final int NULL_SCORE = 0;
+    private static final int COOPERER_SCORE = 3;
+    private static final int DOUBLE_TRAHIR_SCORE = 1;
 
     private Timer timer1;
     private Timer timer2;
@@ -97,17 +97,17 @@ public class Partie {
 
     private void calculerScore(boolean decision1, boolean decision2) {
         if (decision1 && decision2) {
-            joueur1.ajouterScore(C);
-            joueur2.ajouterScore(C);
+            joueur1.ajouterScore(COOPERER_SCORE);
+            joueur2.ajouterScore(COOPERER_SCORE);
         } else if (!decision1 && !decision2) {
-            joueur1.ajouterScore(P);
-            joueur2.ajouterScore(P);
+            joueur1.ajouterScore(DOUBLE_TRAHIR_SCORE);
+            joueur2.ajouterScore(DOUBLE_TRAHIR_SCORE);
         } else if (decision1 && !decision2) {
-            joueur1.ajouterScore(D);
-            joueur2.ajouterScore(T);
+            joueur1.ajouterScore(NULL_SCORE);
+            joueur2.ajouterScore(TRAHIR_SCORE);
         } else {
-            joueur1.ajouterScore(T);
-            joueur2.ajouterScore(D);
+            joueur1.ajouterScore(TRAHIR_SCORE);
+            joueur2.ajouterScore(NULL_SCORE);
         }
     }
 
